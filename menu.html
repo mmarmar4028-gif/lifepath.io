@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Лайни — путь</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to top, #0f0f1a, #1c1c2e);
+    color: white;
+    overflow: hidden;
+}
+
+/* контейнер */
+.container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+}
+
+/* заголовок */
+.title {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    color: #ccc;
+}
+
+/* canvas (тропа) */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* точки уровней */
+.level {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: #a78bfa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(167,139,250,0.6);
+}
+
+/* подписи */
+.label {
+    position: absolute;
+    font-size: 12px;
+    color: #aaa;
+    text-align: center;
+    width: 100px;
+}
+
+/* кнопка назад */
+.back {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 14px;
+    color: #aaa;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="title">твой путь</div>
+
+<canvas id="pathCanvas"></canvas>
+
+<!-- уровни -->
+<div class="level" style="top: 70%; left: 20%;" onclick="goLevel(1)">1</div>
+<div class="label" style="top: 78%; left: 15%;">беззаботное время</div>
+
+<div class="level" style="top: 55%; left: 55%;" onclick="goLevel(2)">2</div>
+<div class="label" style="top: 63%; left: 50%;">переходный период</div>
+
+<div class="level" style="top: 35%; left: 30%;" onclick="goLevel(3)">3</div>
+<div class="label" style="top: 43%; left: 25%;">поиск себя</div>
+
+<div class="level" style="top: 15%; left: 65%;" onclick="goLevel(4)">4</div>
+<div class="label" style="top: 23%; left: 60%;">ближе к себе</div>
+
+<div class="back" onclick="goBack()">← назад</div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("pathCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// рисуем тропу
+function drawPath() {
+    ctx.strokeStyle = "#a78bfa";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(canvas.width * 0.2, canvas.height * 0.75);
+    ctx.quadraticCurveTo(canvas.width * 0.4, canvas.height * 0.65,
+                         canvas.width * 0.55, canvas.height * 0.55);
+
+    ctx.quadraticCurveTo(canvas.width * 0.7, canvas.height * 0.45,
+                         canvas.width * 0.3, canvas.height * 0.35);
+
+    ctx.quadraticCurveTo(canvas.width * 0.5, canvas.height * 0.25,
+                         canvas.width * 0.65, canvas.height * 0.15);
+
+    // продолжение пути вверх (будущее)
+    ctx.quadraticCurveTo(canvas.width * 0.8, canvas.height * 0.05,
+                         canvas.width * 0.9, -50);
+
+    ctx.stroke();
+}
+
+drawPath();
+
+// переходы
+function goLevel(level) {
+    window.location.href = "level" + level + ".html";
+}
+
+function goBack() {
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
