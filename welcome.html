@@ -2,6 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Лайни</title>
 
 <style>
@@ -16,84 +18,63 @@ body {
     height: 100vh;
 }
 
-/* Контейнер */
+/* контейнер */
 .container {
     text-align: center;
+    padding: 20px;
+    max-width: 400px;
 }
 
-/* Заголовок */
+/* заголовок */
 h1 {
-    font-size: 42px;
+    font-size: 36px;
     margin-bottom: 10px;
 }
 
-/* Подзаголовок */
+/* подзаголовок */
 .subtitle {
     color: #aaa;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
-/* Персонаж */
-.character {
-    width: 60px;
-    height: 90px;
-    background: #a78bfa;
-    margin: 0 auto 25px;
-    border-radius: 8px;
-    position: relative;
-}
-
-/* глаза */
-.character::before, .character::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: black;
-    position: absolute;
-    top: 25px;
-    border-radius: 50%;
-}
-
-.character::before {
-    left: 15px;
-}
-
-.character::after {
-    right: 15px;
+/* персонаж */
+.character img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 25px;
 }
 
 /* описание */
 .description {
-    max-width: 400px;
-    margin: 0 auto 30px;
+    font-size: 14px;
     line-height: 1.5;
     color: #ccc;
+    margin-bottom: 30px;
 }
 
 /* кнопка */
 .start-btn {
-    background: #a78bfa;
-    border: none;
-    padding: 12px 28px;
+    width: 100%;
+    padding: 14px;
     font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background: #a78bfa;
     color: white;
-    transition: 0.3s;
+    cursor: pointer;
 }
 
-.start-btn:hover {
+.start-btn:active {
     background: #8b5cf6;
 }
 
-/* подпись */
+/* нижний текст */
 .footer {
-    margin-top: 40px;
-    font-size: 14px;
+    margin-top: 20px;
+    font-size: 12px;
     color: #666;
 }
 </style>
-
 </head>
 
 <body>
@@ -101,19 +82,22 @@ h1 {
 <div class="container">
 
     <h1>Лайни</h1>
-    <div class="subtitle">игра про рост, ошибки и движение вперёд</div>
+    <div class="subtitle">путь вверх никогда не бывает прямым</div>
 
-    <div class="character"></div>
-
-    <div class="description">
-        Помоги Лайни пройти свой путь.
-        Преодолевай препятствия, совершай ошибки и становись лучше.  
+    <div class="character">
+        <img src="MASHA.png" alt="character">
     </div>
 
-    <button class="start-btn" onclick="startGame()">Начать</button>
+    <div class="description">
+       Помоги Маше пройти свой путь. Преодолевай препятствия, совершай ошибки и становись лучше.
+    </div>
+
+    <button class="start-btn" onclick="startGame()">
+        Начать путь
+    </button>
 
     <div class="footer">
-        управление: ↑ / пробел — прыжок, ↓ — присесть
+        игра лучше всего работает на телефоне
     </div>
 
 </div>
