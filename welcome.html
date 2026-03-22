@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Версия n → n+1</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to top, #0f0f1a, #1c1c2e);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Контейнер */
+.container {
+    text-align: center;
+}
+
+/* Заголовок */
+h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+/* Подзаголовок */
+.subtitle {
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+/* Персонаж */
+.character {
+    width: 60px;
+    height: 90px;
+    background: #a78bfa;
+    margin: 0 auto 25px;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* глаза */
+.character::before, .character::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: black;
+    position: absolute;
+    top: 25px;
+    border-radius: 50%;
+}
+
+.character::before {
+    left: 15px;
+}
+
+.character::after {
+    right: 15px;
+}
+
+/* описание */
+.description {
+    max-width: 400px;
+    margin: 0 auto 30px;
+    line-height: 1.5;
+    color: #ccc;
+}
+
+/* кнопка */
+.start-btn {
+    background: #a78bfa;
+    border: none;
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: 0.3s;
+}
+
+.start-btn:hover {
+    background: #8b5cf6;
+}
+
+/* подпись */
+.footer {
+    margin-top: 40px;
+    font-size: 14px;
+    color: #666;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Версия n → n+1</h1>
+    <div class="subtitle">игра про рост, ошибки и движение вперёд</div>
+
+    <div class="character"></div>
+
+    <div class="description">
+        Это не просто игра, а жизненный путь. 
+        Путь через трудности, ошибки, решения и изменения.  
+    </div>
+
+    <button class="start-btn" onclick="startGame()">Начать</button>
+
+    <div class="footer">
+        управление: ↑ / пробел — прыжок, ↓ — присесть
+    </div>
+
+</div>
+
+<script>
+function startGame() {
+    window.location.href = "menu.html";
+}
+</script>
+
+</body>
+</html>
