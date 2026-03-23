@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Лайни — уровень 1</title>
+<title>Лайни — уровень 4</title>
 
 <style>
 body {
@@ -99,9 +99,9 @@ function randomObstacle(x) {
 
 function getLabel(type) {
     const map = {
-        ground: ["съесть суп","выучить стих","утренник"],
-        air: ["танцы","соревнование","родители"],
-        gap: ["страх","сомнения"]
+        ground: ["сессия","проекты","карьера"],
+        air: ["дисциплина","самопознание","уверенность"],
+        gap: ["время","усталость"]
     };
     const arr = map[type];
     return arr[Math.floor(Math.random()*arr.length)];
