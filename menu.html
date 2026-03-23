@@ -87,10 +87,10 @@ canvas {
 /* кредо */
 .credo {
     position: absolute;
-    bottom: 40px;
+    bottom: 20px;
     width: 100%;
     text-align: center;
-    font-size: 17px;
+    font-size: 14px;
     color: #a78bfa;
     opacity: 0.9;
 }
@@ -104,6 +104,7 @@ canvas {
 .avatar {
     animation: float 2s ease-in-out infinite;
 }
+
     .quote {
     position: absolute;
     max-width: 200px;
@@ -139,6 +140,7 @@ canvas {
     80% { opacity: 1; }
     100% { opacity: 0; transform: translateY(-10px); }
 }
+    
 </style>
 </head>
 
@@ -261,7 +263,6 @@ const positions = {
 avatar.style.top = positions[progress].top;
 avatar.style.left = positions[progress].left;
 
-// === КРЕДО ===
 const credos = [
 "Если что-то не нравится, имей смелость это "что-то" изменить",
 "Не приложив должных усилий, не жди чудесногоо результата",
@@ -286,11 +287,11 @@ function showQuote() {
 
     setTimeout(() => {
         quote.remove();
-    }, 10000);
+    }, 9000);
 }
 
 // каждые 3 секунды новая мысль
-setInterval(showQuote, 9000);
+setInterval(showQuote, 6000);
 
 // === ПЕРЕХОДЫ ===
 function goLevel(level) {
@@ -299,7 +300,7 @@ function goLevel(level) {
 }
 
 function goBack() {
-    window.location.href = "welcome.html";
+    window.location.href = "index.html";
 }
 </script>
 
