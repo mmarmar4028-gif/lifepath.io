@@ -72,11 +72,11 @@ img.src = "MASHA.png";
 
 const player = {
     x: 100,
-    y: canvas.height - 160,
-    w: 70,
-    h: 90,
+    y: canvas.height - 190,
+    w: 90,
+    h: 120,
     dy: 0,
-    gravity: 0.6,
+    gravity: 0.5,
     jumps: 0,
     maxJumps: 2,
     crouch: false
@@ -207,7 +207,7 @@ function draw() {
             return;
         }
 
-        let w = 140;
+        let w = 90;
         let h = 50;
 
         // карточка
