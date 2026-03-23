@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Лайни — уровень 1</title>
-
 <style>
 body {
     margin: 0;
@@ -18,7 +16,6 @@ canvas {
     display: block;
 }
 
-/* окна */
 .overlay {
     position: absolute;
     top: 50%;
@@ -69,7 +66,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// === ПЕРСОНАЖ (КАРТИНКА) ===
+// === ПЕРСОНАЖ ===
 const img = new Image();
 img.src = "MASHA.png";
 
@@ -90,9 +87,7 @@ let obstacles = [];
 
 function randomObstacle(x) {
     const types = ["ground", "air", "gap"];
-
     const type = types[Math.floor(Math.random()*types.length)];
-
     return {
         x: x,
         type: type,
@@ -104,27 +99,15 @@ function randomObstacle(x) {
 
 function getLabel(type) {
     const map = {
-        ground: [
-            "съесть суп",
-            "выучить стих",
-            "утренник"
-        ],
-        air: [
-            "танцы",
-            "соревнование",
-            "родители"
-        ],
-        gap: [
-            "неуверенность",
-            "страх ошибки"
-        ]
+        ground: ["съесть суп", "выучить стих", "утренник"],
+        air: ["танцы", "соревнование", "родители"],
+        gap: ["неуверенность", "страх ошибки"]
     };
-
     const arr = map[type];
     return arr[Math.floor(Math.random()*arr.length)];
 }
 
-// создаём уровень (~30 сек)
+// создаём уровень
 for (let i = 1; i < 20; i++) {
     obstacles.push(randomObstacle(i * 450));
 }
@@ -150,6 +133,7 @@ let win = false;
 function update() {
     if (gameOver || win) return;
 
+    // движение игрока
     player.dy += player.gravity;
     player.y += player.dy;
 
@@ -158,27 +142,26 @@ function update() {
         player.jumps = 0;
     }
 
+    // движение препятствий
     obstacles.forEach(o => {
         o.x -= 4;
+    });
 
-        // столкновения
-       obstacles.forEach(o => {
-    o.x -= 3;
+    // проверка столкновений
+    obstacles.forEach(o => {
+        if (!o.renderY) return;
 
-    if (!o.renderY) return;
+        if (
+            player.x < o.x + o.renderW &&
+            player.x + player.w > o.x &&
+            player.y < o.renderY + o.renderH &&
+            player.y + player.h > o.renderY
+        ) {
+            lose();
+        }
+    });
 
-    if (
-        player.x < o.x + o.renderW &&
-        player.x + player.w > o.x &&
-        player.y < o.renderY + o.renderH &&
-        player.y + player.h > o.renderY
-    ) {
-        lose();
-    }
-});
-  
-
-    // финиш
+    // проверка финиша
     if (obstacles[obstacles.length-1].x < 100) {
         win = true;
         document.getElementById("win").style.display = "block";
@@ -211,42 +194,41 @@ function draw() {
     }
 
     // препятствия
-  obstacles.forEach(o => {
+    obstacles.forEach(o => {
+        let y;
 
-    let y;
+        if (o.type === "ground") {
+            y = canvas.height - 140;
+        } else if (o.type === "air") {
+            y = canvas.height - 260;
+        } else if (o.type === "gap") {
+            // обрыв
+            ctx.clearRect(o.x, canvas.height - 80, 80, 80);
+            return;
+        }
 
-    if (o.type === "ground") {
-        y = canvas.height - 140;
-    } else if (o.type === "air") {
-        y = canvas.height - 260;
-    } else if (o.type === "gap") {
-        // обрыв
-        ctx.clearRect(o.x, canvas.height - 80, 80, 80);
-        return;
-    }
+        let w = 140;
+        let h = 50;
 
-    let w = 140;
-    let h = 50;
+        // карточка
+        ctx.fillStyle = "rgba(167,139,250,0.2)";
+        ctx.strokeStyle = "rgba(167,139,250,0.6)";
+        ctx.lineWidth = 1;
 
-    // карточка
-    ctx.fillStyle = "rgba(167,139,250,0.2)";
-    ctx.strokeStyle = "rgba(167,139,250,0.6)";
-    ctx.lineWidth = 1;
+        roundRect(ctx, o.x, y, w, h, 12);
+        ctx.fill();
+        ctx.stroke();
 
-    roundRect(ctx, o.x, y, w, h, 12);
-    ctx.fill();
-    ctx.stroke();
+        // текст
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px Arial";
+        ctx.fillText(o.label, o.x + 10, y + 28);
 
-    // текст
-    ctx.fillStyle = "#fff";
-    ctx.font = "12px Arial";
-    ctx.fillText(o.label, o.x + 10, y + 28);
-
-    // сохраняем координаты для коллизии
-    o.renderY = y;
-    o.renderW = w;
-    o.renderH = h;
-});
+        // сохраняем координаты для коллизии
+        o.renderY = y;
+        o.renderW = w;
+        o.renderH = h;
+    });
 }
 
 // === ЦИКЛ ===
@@ -266,7 +248,9 @@ function restart() {
 function menu() {
     window.location.href = "menu.html";
 }
-    function roundRect(ctx, x, y, w, h, r) {
+
+// === Вспомогательные функции ===
+function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.lineTo(x + w - r, y);
