@@ -79,7 +79,9 @@ canvas {
 .avatar {
     position: absolute;
     width: 90px;
+    transform: translate(-50%, -50%);
     transition: 0.5s;
+    pointer-events: none;
 }
 
 /* кредо */
@@ -91,6 +93,51 @@ canvas {
     font-size: 17px;
     color: #a78bfa;
     opacity: 0.9;
+}
+
+    @keyframes float {
+    0% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-5px); }
+    100% { transform: translate(-50%, -50%) translateY(0); }
+}
+
+.avatar {
+    animation: float 2s ease-in-out infinite;
+}
+    .quote {
+    position: absolute;
+    max-width: 200px;
+    background: rgba(167,139,250,0.15);
+    border: 1px solid rgba(167,139,250,0.4);
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #e0d4ff;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    animation: fadeInOut 6s ease forwards;
+}
+
+/* хвостик облачка */
+.quote::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
+    background: rgba(167,139,250,0.15);
+    border-left: 1px solid rgba(167,139,250,0.4);
+    border-bottom: 1px solid rgba(167,139,250,0.4);
+    transform: rotate(45deg);
+}
+
+/* анимация */
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(10px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
 }
 </style>
 </head>
@@ -205,10 +252,10 @@ let progress = localStorage.getItem("level") || 1;
 const avatar = document.getElementById("avatar");
 
 const positions = {
-    1: {top: "68%", left: "18%"},
-    2: {top: "53%", left: "53%"},
-    3: {top: "33%", left: "28%"},
-    4: {top: "13%", left: "63%"}
+    1: {top: "72%", left: "25%"},
+    2: {top: "58%", left: "48%"},
+    3: {top: "38%", left: "40%"},
+    4: {top: "20%", left: "60%"}
 };
 
 avatar.style.top = positions[progress].top;
@@ -217,14 +264,31 @@ avatar.style.left = positions[progress].left;
 // === КРЕДО ===
 const credos = [
 "Не нравится – меняй. Не можешь изменить — принимай.",
-"Всегда начинай с себя. Обвинять других — последнее дело.",
+"Всегда начинай с себя. Обвинение других — показатель слабости.",
 "Самокритика — двигатель роста.",
 "Изменения начинаются с осознания.",
 "Неужели эти сущие мелочи стоят наших нервов?."   
 ];
 
-document.getElementById("credo").innerText =
-    credos[Math.floor(Math.random()*credos.length)];
+function showQuote() {
+    const quote = document.createElement("div");
+    quote.className = "quote";
+
+    quote.innerText = credos[Math.floor(Math.random() * credos.length)];
+
+    // случайная позиция
+    quote.style.top = Math.random() * 70 + "%";
+    quote.style.left = Math.random() * 70 + "%";
+
+    document.body.appendChild(quote);
+
+    setTimeout(() => {
+        quote.remove();
+    }, 6000);
+}
+
+// каждые 3 секунды новая мысль
+setInterval(showQuote, 6000);
 
 // === ПЕРЕХОДЫ ===
 function goLevel(level) {
