@@ -99,8 +99,8 @@ function randomObstacle(x) {
 
 function getLabel(type) {
     const map = {
-        ground: ["съесть суп","выучить стих","утренник"],
-        air: ["танцы","соревнование","родители"],
+        ground: ["съесть суп","выучить стих","утренник,"],
+        air: ["танцы","конкурс","садик"],
         gap: ["страх","сомнения"]
     };
     const arr = map[type];
@@ -121,7 +121,7 @@ function jump() {
         player.jumps++;
     }
 }
-
+    
 // === ЛОГИКА ===
 let gameOver = false;
 let win = false;
@@ -215,7 +215,7 @@ function draw() {
 
     // === ПЕРСОНАЖ (АНИМАЦИЯ) ===
     if (img.complete) {
-        let bob = Math.sin(time*6) * 5;
+        let bob = Math.sin(time*2) * 4;
         ctx.drawImage(
             img,
             player.x,
