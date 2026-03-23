@@ -79,8 +79,9 @@ canvas {
 .avatar {
     position: absolute;
     width: 90px;
-    transition: 0.5s;
+    transform: translate(-50%, -50%);
     pointer-events: none;
+    animation: float 2s ease-in-out infinite;
 }
 
 /* кредо */
@@ -100,9 +101,6 @@ canvas {
     100% { transform: translate(-50%, -50%) translateY(0); }
 }
 
-.avatar {
-    animation: float 2s ease-in-out infinite;
-}
 
     .quote {
     position: absolute;
@@ -182,7 +180,7 @@ const ctxBg = bg.getContext("2d");
 const path = document.getElementById("pathCanvas");
 const ctx = path.getContext("2d");
 
-    document.querySelector(".container").appendChild(quote);
+  
 // вместо этих двух строк
 // bg.width = path.width = window.innerWidth;
 // bg.height = path.height = window.innerHeight;
@@ -192,7 +190,16 @@ window.addEventListener('load', resizeCanvases);
 window.addEventListener('resize', resizeCanvases);
 
 // и сразу вызвать один раз (на случай, если load уже прошёл)
-resizeCanvases();
+function resizeCanvases() {
+    bg.width = window.innerWidth;
+    bg.height = window.innerHeight;
+
+    path.width = window.innerWidth;
+    path.height = window.innerHeight;
+
+    drawIcons();
+    drawPath();
+}
 
 // === ФОН (иконки) ===
 function drawIcons() {
@@ -323,8 +330,6 @@ function goBack() {
     window.location.href = "welcome.html";
 }
 
-    bg.width = window.innerWidth;
-bg.height = window.innerHeight;
     
 </script>
 
