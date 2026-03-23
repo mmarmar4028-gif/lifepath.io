@@ -177,58 +177,72 @@ function lose() {
 function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // фон
-    ctx.strokeStyle = "rgba(167,139,250,0.2)";
-    ctx.strokeRect(50,100,30,40);
+    // === ФОН С ФРАЗАМИ ===
+    ctx.fillStyle = "rgba(255,255,255,0.15)";
+    ctx.font = "14px Arial";
 
-    // земля
+    const bgPhrases = [
+        "я справлюсь",
+        "это временно",
+        "я уже проходила сложнее",
+        "ошибаться нормально",
+        "двигаюсь дальше"
+    ];
+
+    for (let i = 0; i < 20; i++) {
+        let x = (i * 300 - (performance.now()/20) % 300);
+        let y = (i * 80) % canvas.height;
+        ctx.fillText(bgPhrases[i % bgPhrases.length], x, y);
+    }
+
+    // === КРУТОЙ СКЛОН ===
     ctx.beginPath();
-    ctx.moveTo(0, canvas.height - 80);
-    ctx.lineTo(canvas.width, canvas.height - 120);
+    ctx.moveTo(0, canvas.height - 60);
+    ctx.lineTo(canvas.width, canvas.height - 260); // БЫЛО -120 → теперь круче
     ctx.strokeStyle = "#a78bfa";
+    ctx.lineWidth = 3;
     ctx.stroke();
 
-    // персонаж
+    // === ПЕРСОНАЖ ===
     if (img.complete) {
         ctx.drawImage(img, player.x, player.y, player.w, player.h);
     }
 
-    // препятствия
+    // === ПРЕПЯТСТВИЯ ===
     obstacles.forEach(o => {
         let y;
 
         if (o.type === "ground") {
-            y = canvas.height - 140;
+            y = canvas.height - 180;
         } else if (o.type === "air") {
-            y = canvas.height - 260;
+            y = canvas.height - 320;
         } else if (o.type === "gap") {
-            // обрыв
-            ctx.clearRect(o.x, canvas.height - 80, 80, 80);
+            // нормальный обрыв (не чёрный блок)
+            ctx.fillStyle = "#111";
+            ctx.fillRect(o.x, canvas.height - 80, 100, 80);
             return;
         }
 
-        let w = 90;
+        let w = 80;
         let h = 50;
 
-        // карточка
-        ctx.fillStyle = "rgba(167,139,250,0.2)";
-        ctx.strokeStyle = "rgba(167,139,250,0.6)";
+        ctx.fillStyle = "rgba(167,139,250,0.25)";
+        ctx.strokeStyle = "rgba(167,139,250,0.8)";
         ctx.lineWidth = 1;
 
         roundRect(ctx, o.x, y, w, h, 12);
         ctx.fill();
         ctx.stroke();
 
-        // текст
         ctx.fillStyle = "#fff";
         ctx.font = "12px Arial";
         ctx.fillText(o.label, o.x + 10, y + 28);
 
-        // сохраняем координаты для коллизии
         o.renderY = y;
         o.renderW = w;
         o.renderH = h;
     });
+}
 }
 
 // === ЦИКЛ ===
