@@ -182,18 +182,11 @@ const ctxBg = bg.getContext("2d");
 const path = document.getElementById("pathCanvas");
 const ctx = path.getContext("2d");
 
+    document.querySelector(".container").appendChild(quote);
 // вместо этих двух строк
 // bg.width = path.width = window.innerWidth;
 // bg.height = path.height = window.innerHeight;
 
-// пишем так:
-function resizeCanvases() {
-    bg.width = path.width = window.innerWidth;
-    bg.height = path.height = window.innerHeight;
-    // после изменения размеров — обязательно перерисовываем!
-    drawIcons();
-    drawPath();
-}
 
 window.addEventListener('load', resizeCanvases);
 window.addEventListener('resize', resizeCanvases);
@@ -203,6 +196,9 @@ resizeCanvases();
 
 // === ФОН (иконки) ===
 function drawIcons() {
+    if (!ctxBg) return;
+
+    ctxBg.clearRect(0, 0, bg.width, bg.height);
     ctxBg.strokeStyle = "rgba(167,139,250,0.2)";
     ctxBg.lineWidth = 2;
 
@@ -265,21 +261,31 @@ function drawPath() {
 drawPath();
 
 // === АВАТАР ПО ПРОГРЕССУ ===
-let progress = localStorage.getItem("level") || 1;
 const avatar = document.getElementById("avatar");
 
+// если нет сохранения — ставим 1
+let progress = localStorage.getItem("level");
+if (!progress) progress = 1;
+
+// позиции МЕЖДУ уровнями
 const positions = {
-    1: {top: "68%", left: "18%"},
-    2: {top: "53%", left: "53%"},
-    3: {top: "33%", left: "28%"},
-    4: {top: "13%", left: "63%"}
+    1: {top: "72%", left: "25%"},
+    2: {top: "58%", left: "48%"},
+    3: {top: "38%", left: "40%"},
+    4: {top: "20%", left: "60%"}
 };
 
-avatar.style.top = positions[progress].top;
-avatar.style.left = positions[progress].left;
+// защита от ошибок
+if (positions[progress]) {
+    avatar.style.top = positions[progress].top;
+    avatar.style.left = positions[progress].left;
+} else {
+    avatar.style.top = "72%";
+    avatar.style.left = "25%";
+}
 
 const credos = [
-"Если что-то не нравится, имей смелость это "что-то" изменить",
+"Если что-то не нравится, имей смелость это что-то изменить",
 "Не приложив должных усилий, не жди чудесногоо результата",
 "Всегда начинай с себя. Обвинение других — показатель слабости",
 "Самокритика помогает лучше себя узнавать и расти",
@@ -294,7 +300,6 @@ function showQuote() {
 
     quote.innerText = credos[Math.floor(Math.random() * credos.length)];
 
-    // случайная позиция
     quote.style.top = Math.random() * 70 + "%";
     quote.style.left = Math.random() * 70 + "%";
 
@@ -302,11 +307,11 @@ function showQuote() {
 
     setTimeout(() => {
         quote.remove();
-    }, 9000);
+    }, 6000);
 }
 
-// каждые 3 секунды новая мысль
-setInterval(showQuote, 6000);
+// чуть реже, чтобы не перегружать
+setInterval(showQuote, 4000);
 
 // === ПЕРЕХОДЫ ===
 function goLevel(level) {
@@ -317,6 +322,10 @@ function goLevel(level) {
 function goBack() {
     window.location.href = "welcome.html";
 }
+
+    bg.width = window.innerWidth;
+bg.height = window.innerHeight;
+    
 </script>
 
 </body>
