@@ -254,10 +254,10 @@ let progress = localStorage.getItem("level") || 1;
 const avatar = document.getElementById("avatar");
 
 const positions = {
-    1: {top: "72%", left: "25%"},
-    2: {top: "58%", left: "48%"},
-    3: {top: "38%", left: "40%"},
-    4: {top: "20%", left: "60%"}
+    1: {top: "68%", left: "18%"},
+    2: {top: "53%", left: "53%"},
+    3: {top: "33%", left: "28%"},
+    4: {top: "13%", left: "63%"}
 };
 
 avatar.style.top = positions[progress].top;
@@ -283,7 +283,7 @@ function showQuote() {
     quote.style.top = Math.random() * 70 + "%";
     quote.style.left = Math.random() * 70 + "%";
 
-    document.body.appendChild(quote);
+    document.querySelector(".container").appendChild(quote);
 
     setTimeout(() => {
         quote.remove();
