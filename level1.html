@@ -162,15 +162,14 @@ function update() {
         o.x -= 4;
 
         // столкновения
-        if (o.type === "ground") {
-            if (
-                player.x < o.x + o.width &&
-                player.x + player.w > o.x &&
-                player.y + player.h > canvas.height - 100
-            ) {
-                lose();
-            }
-        }
+        if (
+    player.x < o.x + o.width &&
+    player.x + player.w > o.x &&
+    player.y + player.h > o.y &&
+    player.y < o.y + o.height
+) {
+    lose();
+}
 
         if (o.type === "air" && !player.crouch) {
             if (
@@ -226,28 +225,22 @@ function draw() {
     }
 
     // препятствия
-    obstacles.forEach(o => {
-        ctx.fillStyle = "#999";
+   obstacles.forEach(o => {
 
-        if (o.type === "ground") {
-            ctx.fillRect(o.x, canvas.height - 100, o.width, o.height);
-        }
+    // фон плашки
+    ctx.fillStyle = "rgba(167,139,250,0.2)";
+    ctx.strokeStyle = "rgba(167,139,250,0.6)";
+    ctx.lineWidth = 1;
 
-        if (o.type === "air") {
-            ctx.beginPath();
-            ctx.arc(o.x, canvas.height - 220, 20, 0, Math.PI*2);
-            ctx.fill();
-        }
+    roundRect(ctx, o.x, o.y, o.width, o.height, 12);
+    ctx.fill();
+    ctx.stroke();
 
-        if (o.type === "gap") {
-            ctx.clearRect(o.x, canvas.height - 80, o.width, 80);
-        }
-
-        // текст
-        ctx.fillStyle = "#fff";
-        ctx.font = "10px Arial";
-        ctx.fillText(o.label, o.x - 20, canvas.height - 130);
-    });
+    // текст
+    ctx.fillStyle = "#fff";
+    ctx.font = "12px Arial";
+    ctx.fillText(o.text, o.x + 10, o.y + 28);
+});
 }
 
 // === ЦИКЛ ===
@@ -266,6 +259,19 @@ function restart() {
 
 function menu() {
     window.location.href = "menu.html";
+}
+    function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
 }
 </script>
 
