@@ -182,8 +182,24 @@ const ctxBg = bg.getContext("2d");
 const path = document.getElementById("pathCanvas");
 const ctx = path.getContext("2d");
 
-bg.width = path.width = window.innerWidth;
-bg.height = path.height = window.innerHeight;
+// вместо этих двух строк
+// bg.width = path.width = window.innerWidth;
+// bg.height = path.height = window.innerHeight;
+
+// пишем так:
+function resizeCanvases() {
+    bg.width = path.width = window.innerWidth;
+    bg.height = path.height = window.innerHeight;
+    // после изменения размеров — обязательно перерисовываем!
+    drawIcons();
+    drawPath();
+}
+
+window.addEventListener('load', resizeCanvases);
+window.addEventListener('resize', resizeCanvases);
+
+// и сразу вызвать один раз (на случай, если load уже прошёл)
+resizeCanvases();
 
 // === ФОН (иконки) ===
 function drawIcons() {
