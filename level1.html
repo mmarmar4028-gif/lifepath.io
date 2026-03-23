@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Лайни — уровень 1</title>
+
 <style>
 body {
     margin: 0;
     overflow: hidden;
-    background: linear-gradient(to top, #111, #1c1c2e);
-    font-family: Arial, sans-serif;
+    background: #0e0e1a;
+    font-family: Arial;
 }
 
 canvas {
@@ -27,7 +28,6 @@ canvas {
     text-align: center;
     color: white;
     display: none;
-    width: 80%;
 }
 
 button {
@@ -53,7 +53,7 @@ button {
 </div>
 
 <div id="win" class="overlay">
-    ты справилась с этим этапом 💜  
+    ты справилась 💜  
     <br>идём дальше
     <br><br>
     <button onclick="menu()">дальше</button>
@@ -70,16 +70,17 @@ canvas.height = window.innerHeight;
 const img = new Image();
 img.src = "MASHA.png";
 
+let time = 0;
+
 const player = {
     x: 100,
-    y: canvas.height - 190,
+    y: canvas.height - 200,
     w: 90,
     h: 120,
     dy: 0,
-    gravity: 0.5,
+    gravity: 0.6,
     jumps: 0,
-    maxJumps: 2,
-    crouch: false
+    maxJumps: 2
 };
 
 // === ПРЕПЯТСТВИЯ ===
@@ -88,41 +89,36 @@ let obstacles = [];
 function randomObstacle(x) {
     const types = ["ground", "air", "gap"];
     const type = types[Math.floor(Math.random()*types.length)];
+
     return {
         x: x,
         type: type,
-        width: type === "gap" ? 120 : 60,
-        height: 60,
         label: getLabel(type)
     };
 }
 
 function getLabel(type) {
     const map = {
-        ground: ["съесть суп", "выучить стих", "утренник"],
-        air: ["танцы", "соревнование", "родители"],
-        gap: ["неуверенность", "страх ошибки"]
+        ground: ["съесть суп","выучить стих","утренник"],
+        air: ["танцы","соревнование","родители"],
+        gap: ["страх","сомнения"]
     };
     const arr = map[type];
     return arr[Math.floor(Math.random()*arr.length)];
 }
 
-// создаём уровень
 for (let i = 1; i < 20; i++) {
     obstacles.push(randomObstacle(i * 450));
 }
 
 // === УПРАВЛЕНИЕ ===
-window.addEventListener("keydown", control);
-window.addEventListener("touchstart", control);
+window.addEventListener("keydown", jump);
+window.addEventListener("touchstart", jump);
 
-function control(e) {
+function jump() {
     if (player.jumps < player.maxJumps) {
-        player.dy = -12;
+        player.dy = -13;
         player.jumps++;
-    } else {
-        player.crouch = true;
-        setTimeout(() => player.crouch = false, 500);
     }
 }
 
@@ -133,21 +129,18 @@ let win = false;
 function update() {
     if (gameOver || win) return;
 
-    // движение игрока
+    time += 0.05;
+
     player.dy += player.gravity;
     player.y += player.dy;
 
-    if (player.y >= canvas.height - 160) {
-        player.y = canvas.height - 160;
+    if (player.y >= canvas.height - 200) {
+        player.y = canvas.height - 200;
         player.jumps = 0;
     }
 
-    // движение препятствий
-    obstacles.forEach(o => {
-        o.x -= 4;
-    });
+    obstacles.forEach(o => o.x -= 4);
 
-    // проверка столкновений
     obstacles.forEach(o => {
         if (!o.renderY) return;
 
@@ -161,7 +154,6 @@ function update() {
         }
     });
 
-    // проверка финиша
     if (obstacles[obstacles.length-1].x < 100) {
         win = true;
         document.getElementById("win").style.display = "block";
@@ -177,48 +169,70 @@ function lose() {
 function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // === ФОН С ФРАЗАМИ ===
+    // === ПАРАЛЛАКС ===
+    ctx.fillStyle = "#141428";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // дальний слой
+    ctx.fillStyle = "rgba(167,139,250,0.05)";
+    for (let i = 0; i < 10; i++) {
+        ctx.fillRect((i*300 - time*20)%canvas.width, 100 + i*50, 200, 2);
+    }
+
+    // === ФРАЗЫ ===
     ctx.fillStyle = "rgba(255,255,255,0.15)";
     ctx.font = "14px Arial";
 
-    const bgPhrases = [
+    const phrases = [
         "я справлюсь",
-        "это временно",
-        "я уже проходила сложнее",
-        "ошибаться нормально",
+        "всё получится",
+        "я уже сильнее",
+        "это не навсегда",
         "двигаюсь дальше"
     ];
 
-    for (let i = 0; i < 20; i++) {
-        let x = (i * 300 - (performance.now()/20) % 300);
-        let y = (i * 80) % canvas.height;
-        ctx.fillText(bgPhrases[i % bgPhrases.length], x, y);
+    for (let i = 0; i < 15; i++) {
+        let x = (i*250 - time*60) % canvas.width;
+        let y = (i*80) % canvas.height;
+        ctx.fillText(phrases[i%phrases.length], x, y);
     }
 
-    // === КРУТОЙ СКЛОН ===
+    // === СКЛОН ===
     ctx.beginPath();
     ctx.moveTo(0, canvas.height - 60);
-    ctx.lineTo(canvas.width, canvas.height - 260); // БЫЛО -120 → теперь круче
+    ctx.lineTo(canvas.width, canvas.height - 260);
     ctx.strokeStyle = "#a78bfa";
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // === ПЕРСОНАЖ ===
+    // === СВЕТ ВВЕРХУ ===
+    let gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+    gradient.addColorStop(0, "rgba(167,139,250,0.25)");
+    gradient.addColorStop(1, "transparent");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // === ПЕРСОНАЖ (АНИМАЦИЯ) ===
     if (img.complete) {
-        ctx.drawImage(img, player.x, player.y, player.w, player.h);
+        let bob = Math.sin(time*6) * 5;
+        ctx.drawImage(
+            img,
+            player.x,
+            player.y + bob,
+            player.w,
+            player.h
+        );
     }
 
     // === ПРЕПЯТСТВИЯ ===
     obstacles.forEach(o => {
         let y;
 
-        if (o.type === "ground") {
-            y = canvas.height - 180;
-        } else if (o.type === "air") {
-            y = canvas.height - 320;
-        } else if (o.type === "gap") {
-            // нормальный обрыв (не чёрный блок)
-            ctx.fillStyle = "#111";
+        if (o.type === "ground") y = canvas.height - 180;
+        else if (o.type === "air") y = canvas.height - 320;
+        else {
+            ctx.fillStyle = "#0e0e1a";
             ctx.fillRect(o.x, canvas.height - 80, 100, 80);
             return;
         }
@@ -228,7 +242,6 @@ function draw() {
 
         ctx.fillStyle = "rgba(167,139,250,0.25)";
         ctx.strokeStyle = "rgba(167,139,250,0.8)";
-        ctx.lineWidth = 1;
 
         roundRect(ctx, o.x, y, w, h, 12);
         ctx.fill();
@@ -243,7 +256,6 @@ function draw() {
         o.renderH = h;
     });
 }
-}
 
 // === ЦИКЛ ===
 function loop() {
@@ -251,7 +263,6 @@ function loop() {
     draw();
     requestAnimationFrame(loop);
 }
-
 loop();
 
 // === КНОПКИ ===
@@ -263,18 +274,18 @@ function menu() {
     window.location.href = "menu.html";
 }
 
-// === Вспомогательные функции ===
+// === ФИГУРА ===
 function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);
     ctx.closePath();
 }
 </script>
