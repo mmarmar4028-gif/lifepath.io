@@ -14,13 +14,12 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* canvas */
 canvas {
     display: block;
 }
 
-/* overlay при проигрыше */
-#gameOver {
+/* окна */
+.overlay {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -41,7 +40,6 @@ button {
     border-radius: 8px;
     background: #a78bfa;
     color: white;
-    font-size: 14px;
 }
 </style>
 </head>
@@ -50,13 +48,18 @@ button {
 
 <canvas id="game"></canvas>
 
-<div id="gameOver">
-    <div>
-        ничего страшного, мы же не роботы, а люди и учимся на ошибках.  
-        давай попробуем снова!
-    </div>
+<div id="gameOver" class="overlay">
+    ничего страшного, мы же не роботы  
+    <br>давай попробуем снова!
+    <br><br>
     <button onclick="restart()">ещё раз</button>
-    <button onclick="menu()">в меню</button>
+</div>
+
+<div id="win" class="overlay">
+    ты справилась с этим этапом 💜  
+    <br>идём дальше
+    <br><br>
+    <button onclick="menu()">дальше</button>
 </div>
 
 <script>
@@ -66,98 +69,140 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// === ПЕРСОНАЖ ===
+// === ПЕРСОНАЖ (КАРТИНКА) ===
+const img = new Image();
+img.src = "MASHA.png";
+
 const player = {
     x: 100,
-    y: canvas.height - 150,
-    width: 50,
-    height: 70,
+    y: canvas.height - 160,
+    w: 70,
+    h: 90,
     dy: 0,
     gravity: 0.6,
-    jump: -12,
-    grounded: true
+    jumps: 0,
+    maxJumps: 2,
+    crouch: false
 };
 
 // === ПРЕПЯТСТВИЯ ===
-const obstacleTexts = [
-"съесть суп",
-"тренировка",
-"танцы",
-"выучить стих",
-"утренник",
-"письмо деду морозу",
-"не разозлить родителей"
-];
-
 let obstacles = [];
 
-// создание препятствий
-function createObstacle(x) {
+function randomObstacle(x) {
+    const types = ["ground", "air", "gap"];
+
+    const type = types[Math.floor(Math.random()*types.length)];
+
     return {
         x: x,
-        y: canvas.height - 100,
-        width: 40,
+        type: type,
+        width: 50,
         height: 60,
-        text: obstacleTexts[Math.floor(Math.random()*obstacleTexts.length)]
+        label: getLabel(type)
     };
 }
 
-// наполняем уровень
-for (let i = 1; i <= 7; i++) {
-    obstacles.push(createObstacle(i * 400));
+function getLabel(type) {
+    const map = {
+        ground: [
+            "съесть суп",
+            "выучить стих",
+            "утренник"
+        ],
+        air: [
+            "танцы",
+            "соревнование",
+            "родители"
+        ],
+        gap: [
+            "неуверенность",
+            "страх ошибки"
+        ]
+    };
+
+    const arr = map[type];
+    return arr[Math.floor(Math.random()*arr.length)];
+}
+
+// создаём уровень (~30 сек)
+for (let i = 1; i < 40; i++) {
+    obstacles.push(randomObstacle(i * 250));
 }
 
 // === УПРАВЛЕНИЕ ===
-window.addEventListener("keydown", jump);
-window.addEventListener("touchstart", jump);
+window.addEventListener("keydown", control);
+window.addEventListener("touchstart", control);
 
-function jump() {
-    if (player.grounded) {
-        player.dy = player.jump;
-        player.grounded = false;
+function control(e) {
+    if (player.jumps < player.maxJumps) {
+        player.dy = -12;
+        player.jumps++;
+    } else {
+        player.crouch = true;
+        setTimeout(() => player.crouch = false, 500);
     }
 }
 
-// === ФОН (иконки) ===
-function drawIcons() {
-    ctx.strokeStyle = "rgba(167,139,250,0.2)";
-
-    ctx.strokeRect(50,100,30,40); // книги
-    ctx.strokeRect(200,200,50,30); // ноут
-    ctx.beginPath();
-    ctx.arc(300,150,15,0,Math.PI*2); // яблоко
-    ctx.stroke();
-}
-
-// === ОБНОВЛЕНИЕ ===
+// === ЛОГИКА ===
 let gameOver = false;
+let win = false;
 
 function update() {
-    if (gameOver) return;
+    if (gameOver || win) return;
 
     player.dy += player.gravity;
     player.y += player.dy;
 
-    if (player.y > canvas.height - 150) {
-        player.y = canvas.height - 150;
-        player.dy = 0;
-        player.grounded = true;
+    if (player.y >= canvas.height - 160) {
+        player.y = canvas.height - 160;
+        player.jumps = 0;
     }
 
     obstacles.forEach(o => {
         o.x -= 4;
 
-        // столкновение
-        if (
-            player.x < o.x + o.width &&
-            player.x + player.width > o.x &&
-            player.y < o.y + o.height &&
-            player.y + player.height > o.y
-        ) {
-            gameOver = true;
-            document.getElementById("gameOver").style.display = "block";
+        // столкновения
+        if (o.type === "ground") {
+            if (
+                player.x < o.x + o.width &&
+                player.x + player.w > o.x &&
+                player.y + player.h > canvas.height - 100
+            ) {
+                lose();
+            }
+        }
+
+        if (o.type === "air" && !player.crouch) {
+            if (
+                player.x < o.x + o.width &&
+                player.x + player.w > o.x &&
+                player.y < canvas.height - 220
+            ) {
+                lose();
+            }
+        }
+
+        if (o.type === "gap") {
+            if (
+                player.x > o.x &&
+                player.x < o.x + o.width &&
+                player.y >= canvas.height - 160
+            ) {
+                lose();
+            }
         }
     });
+
+    // финиш
+    if (obstacles[obstacles.length-1].x < 100) {
+        win = true;
+        document.getElementById("win").style.display = "block";
+    }
+}
+
+function lose() {
+    gameOver = true;
+    document.getElementById("gameOver").style.display = "block";
 }
 
 // === ОТРИСОВКА ===
@@ -165,39 +210,54 @@ function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // фон
-    drawIcons();
+    ctx.strokeStyle = "rgba(167,139,250,0.2)";
+    ctx.strokeRect(50,100,30,40);
 
-    // земля (наклон)
+    // земля
     ctx.beginPath();
     ctx.moveTo(0, canvas.height - 80);
     ctx.lineTo(canvas.width, canvas.height - 120);
     ctx.strokeStyle = "#a78bfa";
-    ctx.lineWidth = 4;
     ctx.stroke();
 
     // персонаж
-    ctx.fillStyle = "#a78bfa";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    if (img.complete) {
+        ctx.drawImage(img, player.x, player.y, player.w, player.h);
+    }
 
     // препятствия
     obstacles.forEach(o => {
-        ctx.fillStyle = "#888";
-        ctx.fillRect(o.x, o.y, o.width, o.height);
+        ctx.fillStyle = "#999";
 
+        if (o.type === "ground") {
+            ctx.fillRect(o.x, canvas.height - 100, o.width, o.height);
+        }
+
+        if (o.type === "air") {
+            ctx.beginPath();
+            ctx.arc(o.x, canvas.height - 220, 20, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        if (o.type === "gap") {
+            ctx.clearRect(o.x, canvas.height - 80, o.width, 80);
+        }
+
+        // текст
         ctx.fillStyle = "#fff";
         ctx.font = "10px Arial";
-        ctx.fillText(o.text, o.x - 20, o.y - 10);
+        ctx.fillText(o.label, o.x - 20, canvas.height - 130);
     });
 }
 
 // === ЦИКЛ ===
-function gameLoop() {
+function loop() {
     update();
     draw();
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(loop);
 }
 
-gameLoop();
+loop();
 
 // === КНОПКИ ===
 function restart() {
